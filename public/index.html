@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파일 확장자 차단</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>◎ 파일 확장자 차단</h1>
+        </div>
+
+        <div class="description">
+            파일확장자에 따라 특정 형식의 파일을 첨부하거나 전송하지 못하도록 제한
+        </div>
+
+        <div class="section">
+            <div class="section-label">고정 확장자</div>
+            <div class="fixed-extensions" id="fixedExtensions">
+                <!-- 고정 확장자 체크박스가 여기에 동적으로 생성됩니다 -->
+            </div>
+        </div>
+
+        <div class="loading" id="loading" style="display: none;">
+            로딩 중...
+        </div>
+
+        <div class="error" id="error" style="display: none;">
+            <!-- 에러 메시지가 여기에 표시됩니다 -->
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
