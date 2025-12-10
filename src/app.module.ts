@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { BlockedExtensionModule } from './blocked-extension/blocked-extension.module';
 
 @Module({
   imports: [
@@ -10,6 +11,8 @@ import { AppService } from './app.service';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
+      ignoreEnvFile: false,
+      ignoreEnvVars: false,
     }),
     
     // TypeORM 설정
@@ -28,6 +31,9 @@ import { AppService } from './app.service';
       }),
       inject: [ConfigService],
     }),
+    
+    // 차단 확장자 모듈
+    BlockedExtensionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

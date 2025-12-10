@@ -44,9 +44,9 @@ npm run start:dev
 
 ## API 엔드포인트
 
-- `GET /api/blocked-extensions` - 차단된 확장자 목록 조회
-- `POST /api/blocked-extensions` - 차단 확장자 추가
-- `DELETE /api/blocked-extensions/:id` - 차단 확장자 삭제
+- `GET /api/blocked-extension` - 차단된 확장자 목록 조회
+- `POST /api/blocked-extension` - 차단 확장자 추가
+- `DELETE /api/blocked-extension/:id` - 차단 확장자 삭제
 
 ## 배포
 
