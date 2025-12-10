@@ -1,0 +1,33 @@
+# 의존성
+/node_modules
+/dist
+
+# 환경 변수
+.env
+
+# 로그
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# 테스트
+/coverage
+/.nyc_output
+
+# 빌드
+/build
+/dist
+
