@@ -23,6 +23,27 @@
             </div>
         </div>
 
+        <div class="section">
+            <div class="section-label">커스텀 확장자</div>
+            <div class="custom-input-group">
+                <input 
+                    type="text" 
+                    id="customExtensionInput" 
+                    placeholder="확장자 입력"
+                    maxlength="20"
+                >
+                <button id="addCustomBtn">+추가</button>
+            </div>
+            <div class="custom-extensions-container">
+                <div class="custom-count">
+                    <span id="customCount">0</span>/200
+                </div>
+                <div class="custom-extensions" id="customExtensions">
+                    <!-- 커스텀 확장자 태그가 여기에 동적으로 생성됩니다 -->
+                </div>
+            </div>
+        </div>
+
         <div class="loading" id="loading" style="display: none;">
             로딩 중...
         </div>

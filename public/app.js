@@ -6,6 +6,10 @@ const FIXED_EXTENSIONS = ['bat', 'cmd', 'com', 'cpl', 'exe', 'scr', 'js'];
 
 // DOM 요소
 const fixedExtensionsEl = document.getElementById('fixedExtensions');
+const customExtensionsEl = document.getElementById('customExtensions');
+const customCountEl = document.getElementById('customCount');
+const customInputEl = document.getElementById('customExtensionInput');
+const addCustomBtnEl = document.getElementById('addCustomBtn');
 const loadingEl = document.getElementById('loading');
 const errorEl = document.getElementById('error');
 
@@ -155,6 +159,106 @@ function renderFixedExtensions() {
 }
 
 /**
+ * 커스텀 확장자 목록 가져오기 (고정 확장자 제외)
+ */
+function getCustomExtensions() {
+    return blockedExtensions.filter((b) => !FIXED_EXTENSIONS.includes(b.extension));
+}
+
+/**
+ * 커스텀 확장자 개수 업데이트
+ */
+function updateCustomCount() {
+    const customExtensions = getCustomExtensions();
+    customCountEl.textContent = customExtensions.length;
+}
+
+/**
+ * 커스텀 확장자 렌더링
+ */
+function renderCustomExtensions() {
+    customExtensionsEl.innerHTML = '';
+
+    const customExtensions = getCustomExtensions();
+
+    customExtensions.forEach((item) => {
+        const tag = document.createElement('div');
+        tag.className = 'custom-tag';
+
+        const text = document.createElement('span');
+        text.textContent = item.extension;
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '×';
+        deleteBtn.title = '삭제';
+        deleteBtn.addEventListener('click', async () => {
+            try {
+                await deleteBlockedExtension(item.id);
+                blockedExtensions = blockedExtensions.filter((b) => b.id !== item.id);
+                renderCustomExtensions();
+                updateCustomCount();
+            } catch (error) {
+                // 에러는 이미 showError로 표시됨
+            }
+        });
+
+        tag.appendChild(text);
+        tag.appendChild(deleteBtn);
+        customExtensionsEl.appendChild(tag);
+    });
+
+    updateCustomCount();
+}
+
+/**
+ * 커스텀 확장자 추가
+ */
+async function handleAddCustomExtension() {
+    const input = customInputEl.value.trim();
+
+    if (!input) {
+        showError('확장자를 입력해주세요');
+        return;
+    }
+
+    // 확장자 정규화 (점 제거, 소문자 변환)
+    const normalized = input.toLowerCase().replace(/^\.+/, '');
+
+    if (!normalized) {
+        showError('유효한 확장자를 입력해주세요');
+        return;
+    }
+
+    // 고정 확장자 중복 체크
+    if (FIXED_EXTENSIONS.includes(normalized)) {
+        showError('고정 확장자는 커스텀으로 추가할 수 없습니다');
+        return;
+    }
+
+    // 이미 등록된 확장자 체크
+    if (blockedExtensions.some((b) => b.extension === normalized)) {
+        showError('이미 등록된 확장자입니다');
+        return;
+    }
+
+    // 최대 개수 체크 (커스텀만 200개)
+    const customExtensions = getCustomExtensions();
+    if (customExtensions.length >= 200) {
+        showError('커스텀 확장자는 최대 200개까지만 등록 가능합니다');
+        return;
+    }
+
+    try {
+        const newItem = await addBlockedExtension(normalized);
+        blockedExtensions.push(newItem);
+        renderCustomExtensions();
+        customInputEl.value = ''; // 입력창 초기화
+    } catch (error) {
+        // 에러는 이미 showError로 표시됨
+    }
+}
+
+/**
  * 초기 데이터 로드
  */
 async function init() {
@@ -166,6 +270,7 @@ async function init() {
 
         // UI 렌더링
         renderFixedExtensions();
+        renderCustomExtensions();
     } catch (error) {
         console.error('Initialization error:', error);
     } finally {
@@ -173,6 +278,18 @@ async function init() {
     }
 }
 
-// 페이지 로드 시 초기화
-document.addEventListener('DOMContentLoaded', init);
+// 이벤트 리스너 등록
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+
+    // 추가 버튼 클릭
+    addCustomBtnEl.addEventListener('click', handleAddCustomExtension);
+
+    // Enter 키로 추가
+    customInputEl.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            handleAddCustomExtension();
+        }
+    });
+});
 

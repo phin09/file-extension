@@ -91,6 +91,99 @@ body {
     opacity: 0.5;
 }
 
+/* 커스텀 확장자 입력 */
+.custom-input-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    max-width: 600px;
+}
+
+.custom-input-group input {
+    flex: 1;
+    max-width: 500px;
+    padding: 10px 16px;
+    font-size: 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.custom-input-group input:focus {
+    border-color: #2563eb;
+}
+
+.custom-input-group button {
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 500;
+    background-color: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    min-width: 80px;
+}
+
+.custom-input-group button:hover {
+    background-color: #4b5563;
+}
+
+/* 커스텀 확장자 컨테이너 */
+.custom-extensions-container {
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    min-height: 300px;
+    max-width: 600px;
+    padding: 16px;
+    background-color: #fafafa;
+}
+
+.custom-count {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
+.custom-extensions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.custom-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background-color: #e5e7eb;
+    border-radius: 16px;
+    font-size: 14px;
+    color: #374151;
+}
+
+.custom-tag button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 0;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.custom-tag button:hover {
+    color: #dc2626;
+}
+
 /* 로딩 */
 .loading {
     text-align: center;
@@ -122,6 +215,23 @@ body {
 
     .fixed-extensions {
         gap: 10px 16px;
+    }
+
+    .custom-input-group {
+        flex-direction: column;
+        max-width: 100%;
+    }
+
+    .custom-input-group input {
+        max-width: 100%;
+    }
+
+    .custom-input-group button {
+        width: 100%;
+    }
+
+    .custom-extensions-container {
+        max-width: 100%;
     }
 }
 
