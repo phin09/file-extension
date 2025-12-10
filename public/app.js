@@ -229,9 +229,25 @@ async function handleAddCustomExtension() {
         return;
     }
 
-    // 고정 확장자 중복 체크
+    // 고정 확장자인 경우 체크박스에 추가
     if (FIXED_EXTENSIONS.includes(normalized)) {
-        showError('고정 확장자는 커스텀으로 추가할 수 없습니다');
+        // 이미 체크되어 있는지 확인
+        const isAlreadyBlocked = blockedExtensions.some((b) => b.extension === normalized);
+        
+        if (isAlreadyBlocked) {
+            showError(`"${normalized}"는 이미 고정 확장자로 등록되어 있습니다`);
+        } else {
+            // 고정 확장자 체크박스 체크
+            try {
+                const newItem = await addBlockedExtension(normalized);
+                blockedExtensions.push(newItem);
+                renderFixedExtensions(); // 고정 확장자 UI 업데이트
+                showError(`"${normalized}"를 고정 확장자로 추가했습니다`);
+            } catch (error) {
+                // 에러는 이미 showError로 표시됨
+            }
+        }
+        customInputEl.value = ''; // 입력창 초기화
         return;
     }
 
