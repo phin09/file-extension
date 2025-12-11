@@ -4,6 +4,23 @@ const API_BASE_URL = '/api/blocked-extension';
 // 고정 확장자 목록 (프론트엔드에 하드코딩)
 const FIXED_EXTENSIONS = ['bat', 'cmd', 'com', 'cpl', 'exe', 'scr', 'js'];
 
+// MIME-DB CDN URL
+const MIME_DB_URL = 'https://cdn.jsdelivr.net/npm/mime-db@latest/db.json';
+
+// 폴백: 기본 알려진 확장자 목록
+const FALLBACK_EXTENSIONS = [
+    'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico',
+    'mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm',
+    'mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a',
+    'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'rtf',
+    'zip', 'rar', '7z', 'tar', 'gz', 'bz2',
+    'js', 'ts', 'py', 'java', 'cpp', 'c', 'h', 'html', 'css', 'json', 'xml',
+    'php', 'rb', 'go', 'rs', 'swift', 'kt', 'sh', 'sql'
+];
+
+// 알려진 확장자 목록 (mime-db에서 로드)
+let knownExtensions = new Set(FALLBACK_EXTENSIONS);
+
 // DOM 요소
 const fixedExtensionsEl = document.getElementById('fixedExtensions');
 const customExtensionsEl = document.getElementById('customExtensions');
@@ -46,7 +63,7 @@ async function fetchBlockedExtensions() {
             throw new Error('차단 확장자 목록을 불러오는데 실패했습니다');
         }
         const data = await response.json();
-        return data.data; // [{ id, extension, createdAt, updatedAt }]
+        return data.data; // [{ id, extension, createdAt }]
     } catch (error) {
         console.error('Error fetching blocked extensions:', error);
         showError(error.message);
@@ -211,6 +228,39 @@ function renderCustomExtensions() {
 }
 
 /**
+ * MIME-DB에서 알려진 확장자 목록 로드
+ */
+async function loadKnownExtensions() {
+    try {
+        const response = await fetch(MIME_DB_URL);
+        if (!response.ok) throw new Error('MIME-DB 로드 실패');
+        
+        const mimeDb = await response.json();
+        const extensions = new Set();
+        
+        // mime-db에서 모든 확장자 추출
+        Object.values(mimeDb).forEach((mimeType) => {
+            if (mimeType.extensions) {
+                mimeType.extensions.forEach((ext) => extensions.add(ext));
+            }
+        });
+        
+        knownExtensions = extensions;
+        console.log(`✅ ${extensions.size}개의 알려진 확장자 로드 완료`);
+    } catch (error) {
+        console.warn('⚠️ MIME-DB 로드 실패, 폴백 목록 사용:', error);
+        knownExtensions = new Set(FALLBACK_EXTENSIONS);
+    }
+}
+
+/**
+ * 확장자가 알려진 확장자인지 확인
+ */
+function isKnownExtension(extension) {
+    return knownExtensions.has(extension);
+}
+
+/**
  * 커스텀 확장자 추가
  */
 async function handleAddCustomExtension() {
@@ -226,6 +276,11 @@ async function handleAddCustomExtension() {
 
     if (!normalized) {
         showError('유효한 확장자를 입력해주세요');
+        return;
+    }
+
+    if (normalized.length > 20) {
+        showError('확장자는 최대 20자까지 입력 가능합니다');
         return;
     }
 
@@ -264,6 +319,20 @@ async function handleAddCustomExtension() {
         return;
     }
 
+    // MIME 타입 검증 (알려지지 않은 확장자 경고)
+    if (!isKnownExtension(normalized)) {
+        const confirmed = confirm(
+            `⚠️ 알 수 없는 확장자\n\n` +
+            `"${normalized}"은(는) 알려지지 않은 확장자입니다.\n` +
+            `그래도 저장하시겠습니까?`
+        );
+        
+        if (!confirmed) {
+            return; // 취소 선택 시 저장 안 함
+        }
+    }
+
+    // 저장
     try {
         const newItem = await addBlockedExtension(normalized);
         blockedExtensions.push(newItem);
@@ -281,6 +350,9 @@ async function init() {
     setLoading(true);
 
     try {
+        // mime-db 로드 (비동기, 백그라운드)
+        loadKnownExtensions(); // await 없이 실행 (블로킹하지 않음)
+
         // 서버에서 차단 확장자 목록 조회
         blockedExtensions = await fetchBlockedExtensions();
 

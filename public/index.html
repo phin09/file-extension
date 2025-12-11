@@ -29,8 +29,10 @@
                 <input 
                     type="text" 
                     id="customExtensionInput" 
-                    placeholder="확장자 입력"
+                    placeholder="확장자 입력 (예: pdf, mp4)"
                     maxlength="20"
+                    pattern="[a-zA-Z0-9.]+"
+                    title="영문자, 숫자만 입력 가능 (최대 20자)"
                 >
                 <button id="addCustomBtn">+추가</button>
             </div>
