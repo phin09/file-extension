@@ -6,7 +6,13 @@
 
 - 고정 확장자 선택 (bat, cmd, com, cpl, exe, scr, js)
 - 커스텀 확장자 추가 (최대 200개)
-- 차단 설정 저장 및 관리
+- 차단한 확장자 설정 저장
+
+### 고려사항
+- 영어 입력시 소문자로 변환하여 저장
+- 커스텀 확장자 중복 체크
+- 고정 확장자 목록에 있는 확장자를 커스텀 확장자로 추가하는 경우
+- 체크된 고정 확장자를 커스텀 확장자로 추가하는 경우
 
 ## 기술 스택
 
@@ -19,9 +25,17 @@
 
 ### 1. 환경 변수 설정
 
-```bash
-cp env.example .env
-# .env 파일을 열어 데이터베이스 설정 입력
+`.env` 파일을 생성하고 다음 내용을 입력합니다:
+
+```env
+PORT=3000
+NODE_ENV=development
+
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+DB_DATABASE=file_extension_blocker
 ```
 
 ### 2. 의존성 설치
@@ -50,5 +64,15 @@ npm run start:dev
 
 ## 배포
 
-GCP Cloud Run 배포 가이드는 추후 작성 예정입니다.
 
+이 애플리케이션은 Google Cloud Platform의 Cloud Run에 배포할 수 있습니다.
+
+**배포 가이드:** [DEPLOY.md](./DEPLOY.md) 참고
+
+#### 필요한 GCP 서비스
+
+- **Cloud Run**: 애플리케이션 호스팅
+- **Cloud SQL (MySQL)**: 데이터베이스
+- **Secret Manager**: 환경변수 관리
+- **Cloud Build**: 자동 빌드 및 배포
+- **Container Registry**: Docker 이미지 저장

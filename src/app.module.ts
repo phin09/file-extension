@@ -18,17 +18,37 @@ import { BlockedExtensionModule } from './blocked-extension/blocked-extension.mo
     // TypeORM 설정
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get('DB_HOST'),
-        port: configService.get('DB_PORT'),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: configService.get('NODE_ENV') === 'development', // 프로덕션에서는 false로 설정
-        logging: configService.get('NODE_ENV') === 'development',
-      }),
+      useFactory: (configService: ConfigService) => {
+        const dbHost = configService.get('DB_HOST');
+        const isUnixSocket = dbHost?.startsWith('/cloudsql/');
+
+        // Cloud SQL Unix 소켓 연결 설정
+        if (isUnixSocket) {
+          return {
+            type: 'mysql',
+            socketPath: dbHost,
+            username: configService.get('DB_USERNAME'),
+            password: configService.get('DB_PASSWORD'),
+            database: configService.get('DB_DATABASE'),
+            entities: [__dirname + '/**/*.entity{.ts,.js}'],
+            synchronize: configService.get('NODE_ENV') === 'development',
+            logging: configService.get('NODE_ENV') === 'development',
+          };
+        }
+
+        // 일반 TCP 연결 설정 (로컬 개발)
+        return {
+          type: 'mysql',
+          host: dbHost,
+          port: parseInt(configService.get('DB_PORT'), 10),
+          username: configService.get('DB_USERNAME'),
+          password: configService.get('DB_PASSWORD'),
+          database: configService.get('DB_DATABASE'),
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          synchronize: configService.get('NODE_ENV') === 'development',
+          logging: configService.get('NODE_ENV') === 'development',
+        };
+      },
       inject: [ConfigService],
     }),
     
